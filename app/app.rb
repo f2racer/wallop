@@ -143,11 +143,87 @@ module Wallop
       erb :channel
     end
 
-    get '/channelsdirect/:channel.m3u8' do
+    get '/channelsdirect1kk/:channel.m3u8' do
 
       ## validate input
       resolution = '1280x720'
       bitrate = '1000k'
+      channel = params[:channel] =~ /\A\d+(.\d+)?\z/ ? params[:channel] : '3'
+
+      if !Wallop.sessions.has_key?(channel)
+        Wallop.cleanup_channel(channel)
+        Wallop.logger.info "Tuning channel #{channel} with quality settings of #{resolution} @ #{bitrate}"
+        pid  = POSIX::Spawn::spawn(Wallop.ffmpeg_command(channel, resolution, bitrate))
+        Process::waitpid(pid, Process::WNOHANG)
+        Wallop.logger.info "Creating session for channel #{channel}"
+        Wallop.sessions[params[:channel]] = {:channel => channel, :pid => pid, :ready => false, :last_read => Time.now}
+      end
+
+      JSON.dump({:status => 200, :message => 'ok'})
+
+      sleep(3)
+
+      session = Wallop.sessions[params[:channel]]
+      halt 404 if !session
+
+      JSON.dump(session)
+
+      content_type :m3u8
+
+      session = Wallop.sessions[params[:channel]]
+      halt 404 if !session
+
+      halt 420 if !session[:ready]
+
+      session[:last_read] = Time.now
+
+      send_file(File.join(Wallop.transcoding_path, "#{session[:channel]}.m3u8"))
+
+    end
+
+    get '/channelsdirect3kk/:channel.m3u8' do
+
+      ## validate input
+      resolution = '1280x720'
+      bitrate = '3000k'
+      channel = params[:channel] =~ /\A\d+(.\d+)?\z/ ? params[:channel] : '3'
+
+      if !Wallop.sessions.has_key?(channel)
+        Wallop.cleanup_channel(channel)
+        Wallop.logger.info "Tuning channel #{channel} with quality settings of #{resolution} @ #{bitrate}"
+        pid  = POSIX::Spawn::spawn(Wallop.ffmpeg_command(channel, resolution, bitrate))
+        Process::waitpid(pid, Process::WNOHANG)
+        Wallop.logger.info "Creating session for channel #{channel}"
+        Wallop.sessions[params[:channel]] = {:channel => channel, :pid => pid, :ready => false, :last_read => Time.now}
+      end
+
+      JSON.dump({:status => 200, :message => 'ok'})
+
+      sleep(3)
+
+      session = Wallop.sessions[params[:channel]]
+      halt 404 if !session
+
+      JSON.dump(session)
+
+      content_type :m3u8
+
+      session = Wallop.sessions[params[:channel]]
+      halt 404 if !session
+
+      halt 420 if !session[:ready]
+
+      session[:last_read] = Time.now
+
+      send_file(File.join(Wallop.transcoding_path, "#{session[:channel]}.m3u8"))
+
+    end
+
+    get '/channelsdirect/:channel.m3u8' do
+
+      ## validate input
+      resolution = params[:resolution] =~ /\A\d+x\d+\z/ ? params[:resolution] : '1280x720'
+      bitrate = params[:bitrate] =~ /\A\d+k\z/ ? params[:bitrate] : '1000k'
       channel = params[:channel] =~ /\A\d+(.\d+)?\z/ ? params[:channel] : '3'
 
       if !Wallop.sessions.has_key?(channel)

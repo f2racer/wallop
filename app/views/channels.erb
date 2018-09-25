@@ -15,8 +15,12 @@
             <%= "#{channel['GuideNumber']} - #{channel['GuideName']}" %>
           </a>
 	        &nbsp; | &nbsp;
-          <a href="/channelsdirect/<%= channel['GuideNumber']%>.m3u8">
-            <%= "#{channel['GuideNumber']}"%> DV 1kk
+          <a href="/channelsdirect1kk/<%= channel['GuideNumber']%>.m3u8">
+            DV 1kk
+          </a>
+          &nbsp; | &nbsp;
+          <a href="/channelsdirect3kk/<%= channel['GuideNumber']%>.m3u8">
+            DV 3kk
           </a>
           <a href="#" class="favorite <%= 'starred' if Wallop.favorite_channels.include?(channel['GuideNumber'])%>" data-channel="<%= channel['GuideNumber'] %>"><i class="<%= Wallop.favorite_channels.include?(channel['GuideNumber']) ? 'icon-star' : 'icon-star-empty' %> icon-large pull-right"></i></a>
         </td>
