@@ -8,13 +8,13 @@ $ ->
     $('#video-player').data('status-url')
 
   tuneUrl = ->
-    $('#video-player').data('tune-url') + "?resolution=" + resolution() + "&bitrate=" + bitrate() + "&profile=" + profile() 
+    $('#video-player').data('tune-url') + "?resolution=" + resolution() + "&bitrate=" + bitrate() + "&profile=" + profile()
 
   playUrl = ->
     $('#video-player').data('play-url')
 
   bitrate = ->
-    localStorage.bitrate || "3000k"
+    localStorage.bitrate || "1000k"
 
   resolution = ->
     localStorage.resolution || "1280x720"
