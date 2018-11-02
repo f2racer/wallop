@@ -27,18 +27,18 @@ module Wallop
 
   def self.ffmpeg_command(channel, resolution='1280x720', bitrate='1000k')
     audio_options = config['ffmpeg']['acodec'] == 'copy' ? '-acodec copy' : "-ac #{config['ffmpeg']['ac']} -acodec #{config['ffmpeg']['acodec']}"
-    %{exec #{config['ffmpeg_path']} -threads #{config['ffmpeg']['threads']} -f mpegts -analyzeduration 2000000 -i #{raw_stream_url_for_channel(channel)} #{audio_options} -b:v #{bitrate} -bufsize #{bitrate.to_i*2}k -minrate #{bitrate.gsub(/\d+/){ |o| (o.to_i * 0.80).to_i }} -maxrate #{bitrate} -vcodec #{config['ffmpeg']['vcodec']} -s #{resolution} -preset #{config['ffmpeg']['h264_preset']} -r #{config['ffmpeg']['framerate']} -hls_time #{config['ffmpeg']['hls_time']} -hls_wrap #{config['ffmpeg']['hls_wrap']} #{config['ffmpeg']['options']} #{transcoding_path}/#{channel}.m3u8 >log/ffmpeg.log 2>&1}
+    %{exec #{config['ffmpeg_path']} -threads #{config['ffmpeg']['threads']} -f mpegts -analyzeduration 3000000 -i #{raw_stream_url_for_channel(channel)} #{audio_options} -b:v #{bitrate} -bufsize #{bitrate.to_i*2}k -minrate #{bitrate.gsub(/\d+/){ |o| (o.to_i * 0.80).to_i }} -maxrate #{bitrate} -vcodec #{config['ffmpeg']['vcodec']} -s #{resolution} -preset #{config['ffmpeg']['h264_preset']} -r #{config['ffmpeg']['framerate']} -hls_time #{config['ffmpeg']['hls_time']} -hls_wrap #{config['ffmpeg']['hls_wrap']} #{config['ffmpeg']['options']} #{transcoding_path}/#{channel}.m3u8 >log/ffmpeg.log 2>&1}
   end
 
   def self.ffmpeg_no_transcode_command(channel, profile='mobile')
     audio_options = config['ffmpeg']['acodec'] == 'copy' ? '-acodec copy' : "-ac #{config['ffmpeg']['ac']} -acodec #{config['ffmpeg']['acodec']}"
-    %{exec #{config['ffmpeg_path']} -threads #{config['ffmpeg']['threads']} -f mpegts -analyzeduration 2000000 -i #{raw_stream_url_for_channel(channel)}?transcode=#{profile} #{audio_options} -vcodec copy -hls_time #{config['ffmpeg']['hls_time']} -hls_wrap #{config['ffmpeg']['hls_wrap']} #{config['ffmpeg']['options']} #{transcoding_path}/#{channel}.m3u8 >log/ffmpeg.log 2>&1}
+    %{exec #{config['ffmpeg_path']} -threads #{config['ffmpeg']['threads']} -f mpegts -analyzeduration 3000000 -i #{raw_stream_url_for_channel(channel)}?transcode=#{profile} #{audio_options} -vcodec copy -hls_time #{config['ffmpeg']['hls_time']} -hls_wrap #{config['ffmpeg']['hls_wrap']} #{config['ffmpeg']['options']} #{transcoding_path}/#{channel}.m3u8 >log/ffmpeg.log 2>&1}
   end
 
   def self.snapshot_command(channel, width=nil)
     width ||= 'iw/3'
     file = "#{channel}-#{Time.now.to_i}.png"
-    [%{#{config['ffmpeg_path']} -r 1 -f mpegts -analyzeduration 2000000 -i #{raw_stream_url_for_channel(channel)} -vcodec png -map 0:0 -an -sn -updatefirst 1 -t 00:00:01 -vf scale=#{width}:-1 app/public/snapshots/#{file} -loglevel quiet}, file]
+    [%{#{config['ffmpeg_path']} -r 1 -f mpegts -analyzeduration 3000000 -i #{raw_stream_url_for_channel(channel)} -vcodec png -map 0:0 -an -sn -updatefirst 1 -t 00:00:01 -vf scale=#{width}:-1 app/public/snapshots/#{file} -loglevel quiet}, file]
   end
 
   def self.snapshot(channel, width=nil)
